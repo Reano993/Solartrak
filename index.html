@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1117">
+  <meta name="description" content="Pencatatan pemakaian solar per unit dan laporan harian, bulanan, tahunan.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>SolarTrack — Manajemen Solar</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">⛽</div>
+        <div><strong>SolarTrack</strong><small>FUEL MANAGEMENT</small></div>
+      </div>
+      <div class="storage-pill"><i></i><span id="storageStatus">Lokal di perangkat</span></div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <p class="eyebrow">CATAT TEPAT, KONTROL HEMAT</p>
+        <h1>Manajemen<br>Solar</h1>
+        <p class="subline" id="todayLabel">Memuat tanggal…</p>
+      </section>
+
+      <section class="hero-card">
+        <div class="hero-top"><span>Total solar hari ini</span><span class="hero-icon">↗</span></div>
+        <div class="hero-number"><span id="todayTotal">0</span><small>Liter</small></div>
+        <div class="hero-foot"><span><b id="todayUnits">0</b> unit tercatat</span><span id="todayDateShort"></span></div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="stat-card"><span class="stat-label">Pengisian hari ini</span><strong id="todayEntries">0</strong><small>transaksi</small></article>
+        <article class="stat-card"><span class="stat-label">Rata-rata per unit</span><strong id="todayAverage">0</strong><small>liter / unit</small></article>
+      </section>
+
+      <section class="panel" id="inputPanel">
+        <div class="section-heading"><div><p class="eyebrow">INPUT DATA</p><h2>Catat pengisian</h2></div><span class="section-mark">＋</span></div>
+        <form id="entryForm">
+          <label for="unitInput">Nama / kode unit</label>
+          <input id="unitInput" name="unit" type="text" maxlength="40" placeholder="Contoh: DT01, EXC02" autocomplete="off" required>
+          <div class="form-row">
+            <div class="field">
+              <label for="literInput">Jumlah solar (liter)</label>
+              <input id="literInput" name="liter" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Contoh: 85" required>
+            </div>
+            <div class="field">
+              <label for="dateInput">Tanggal</label>
+              <input id="dateInput" name="date" type="date" required>
+            </div>
+          </div>
+          <label for="noteInput">Keterangan <span class="optional">opsional</span></label>
+          <input id="noteInput" name="note" type="text" maxlength="120" placeholder="Contoh: pengisian shift pagi">
+          <button class="primary-btn" type="submit" id="saveBtn"><span>＋</span> Simpan pengisian</button>
+          <button class="text-btn hidden" type="button" id="cancelEditBtn">Batalkan edit</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">AKTIVITAS</p><h2>Data hari ini</h2></div><span class="count-chip" id="entryCountChip">0 data</span></div>
+        <div id="todayList" class="entry-list"><div class="empty-state">Belum ada pengisian hari ini.</div></div>
+      </section>
+
+      <section class="panel report-panel">
+        <div class="section-heading"><div><p class="eyebrow">ANALISIS</p><h2>Laporan pemakaian</h2></div></div>
+        <div class="segmented" role="tablist">
+          <button class="segment active" data-period="day">Harian</button>
+          <button class="segment" data-period="month">Bulanan</button>
+          <button class="segment" data-period="year">Tahunan</button>
+        </div>
+        <div class="filter-row">
+          <label for="periodInput" id="periodLabel">Pilih tanggal</label>
+          <input id="periodInput" type="date">
+        </div>
+        <div class="report-summary">
+          <div><small>Total solar</small><strong id="periodTotal">0 L</strong></div>
+          <div><small>Jumlah pengisian</small><strong id="periodEntries">0</strong></div>
+          <div><small>Unit berbeda</small><strong id="periodUnits">0</strong></div>
+        </div>
+        <div id="periodBreakdown" class="breakdown"></div>
+      </section>
+
+      <section class="panel backup-panel">
+        <div class="section-heading"><div><p class="eyebrow">PERLINDUNGAN DATA</p><h2>Cadangan data</h2></div><span class="backup-icon">⌁</span></div>
+        <p class="panel-copy">Data utama tersimpan di database lokal HP. Buat file cadangan dan simpan di Drive atau tempat lain agar tetap aman jika HP hilang atau data situs dihapus.</p>
+        <div class="backup-status" id="backupStatus">Pemeriksaan cadangan…</div>
+        <div class="backup-actions">
+          <button class="secondary-btn" id="exportBtn">↓ Unduh backup</button>
+          <button class="secondary-btn" id="importBtn">↑ Pulihkan backup</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+        </div>
+        <button class="quiet-btn" id="storageBtn">Aktifkan perlindungan penyimpanan</button>
+      </section>
+
+      <section class="panel settings-panel">
+        <div class="section-heading"><div><p class="eyebrow">APLIKASI</p><h2>Pengaturan</h2></div><span class="settings-icon">⚙</span></div>
+        <div class="setting-row"><div><strong>Pasang di layar utama</strong><small>Gunakan SolarTrack seperti aplikasi biasa.</small></div><button class="mini-btn" id="installBtn">Pasang</button></div>
+        <div class="setting-row"><div><strong>Pengingat backup mingguan</strong><small id="reminderText">Muncul saat aplikasi dibuka.</small></div><span class="toggle-on">AKTIF</span></div>
+        <div class="setting-row"><div><strong>Status penyimpanan</strong><small id="persistText">Memeriksa izin penyimpanan…</small></div><span class="status-dot"></span></div>
+      </section>
+      <footer>SolarTrack <span>•</span> Data tersimpan di perangkat</footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop hidden" id="reminderModal">
+    <div class="modal">
+      <div class="modal-symbol">⌁</div><p class="eyebrow">PENGINGAT MINGGUAN</p>
+      <h2>Waktunya backup data</h2>
+      <p>Cadangan otomatis di perangkat bukan pengganti file backup di tempat lain. Unduh backup sekarang dan simpan di Google Drive atau perangkat lain.</p>
+      <div class="modal-actions"><button class="quiet-btn" id="remindLater">Nanti</button><button class="primary-btn" id="remindBackup">Unduh backup</button></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
